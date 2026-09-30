@@ -57,6 +57,313 @@ cd src/UniCribz.Web && dotnet run
 
 ---
 
+## Full File Structure
+
+```
+UniCribz-Student-Accommodation-System/
+│
+├── .github/
+│   └── workflows/
+│       ├── ci.yml                          # Lint, unit tests, build, integration tests
+│       ├── deploy-staging.yml              # Deploy to staging on merge to develop
+│       └── deploy-production.yml           # Deploy to production on tag
+│
+├── docs/
+│   ├── diagrams/
+│   │   ├── domain-class-diagram.png
+│   │   ├── design-class-diagram.png
+│   │   ├── ERD.png
+│   │   ├── system-architecture.png
+│   │   ├── cloud-architecture.png
+│   │   ├── sequence-viewing.png
+│   │   ├── sequence-maintenance.png
+│   │   ├── state-maintenance.png
+│   │   ├── state-room.png
+│   │   └── branch-strategy.png
+│   ├── deployment/
+│   │   ├── deployment-plan.md
+│   │   └── rollback-procedure.md
+│   ├── security/
+│   │   ├── security-architecture.md
+│   │   └── risk-register.md
+│   └── data-migration-plan.md
+│
+├── infrastructure/
+│   ├── arm-templates/
+│   │   ├── network.json
+│   │   ├── compute.json
+│   │   ├── database.json
+│   │   ├── storage.json
+│   │   └── monitoring.json
+│   ├── bicep/
+│   │   └── main.bicep
+│   └── scripts/
+│       ├── deploy-infrastructure.ps1
+│       └── setup-keyvault.ps1
+│
+├── src/
+│   │
+│   ├── UniCribz.Api/                       # ASP.NET Core Web API (Backend)
+│   │   ├── Controllers/
+│   │   │   ├── AuthController.cs
+│   │   │   ├── PropertyController.cs
+│   │   │   ├── RoomController.cs
+│   │   │   ├── ApplicationController.cs
+│   │   │   ├── ViewingController.cs
+│   │   │   ├── LeaseController.cs
+│   │   │   ├── PaymentController.cs
+│   │   │   ├── MaintenanceController.cs
+│   │   │   ├── ComplaintController.cs
+│   │   │   ├── AnnouncementController.cs
+│   │   │   ├── NotificationController.cs
+│   │   │   ├── ReportController.cs
+│   │   │   └── GoogleMapsController.cs
+│   │   ├── Services/
+│   │   │   ├── Interfaces/
+│   │   │   │   ├── IUserService.cs
+│   │   │   │   ├── IPropertyService.cs
+│   │   │   │   ├── IRoomService.cs
+│   │   │   │   ├── IApplicationService.cs
+│   │   │   │   ├── IViewingService.cs
+│   │   │   │   ├── ILeaseService.cs
+│   │   │   │   ├── IPaymentService.cs
+│   │   │   │   ├── IMaintenanceService.cs
+│   │   │   │   ├── IComplaintService.cs
+│   │   │   │   ├── IAnnouncementService.cs
+│   │   │   │   ├── INotificationService.cs
+│   │   │   │   ├── IReportService.cs
+│   │   │   │   ├── IGoogleMapsService.cs
+│   │   │   │   └── ISmartAllocationService.cs
+│   │   │   ├── UserService.cs
+│   │   │   ├── PropertyService.cs
+│   │   │   ├── RoomService.cs
+│   │   │   ├── ApplicationService.cs
+│   │   │   ├── ViewingService.cs
+│   │   │   ├── LeaseService.cs
+│   │   │   ├── PaymentService.cs
+│   │   │   ├── MaintenanceService.cs
+│   │   │   ├── ComplaintService.cs
+│   │   │   ├── AnnouncementService.cs
+│   │   │   ├── NotificationService.cs
+│   │   │   ├── ReportService.cs
+│   │   │   ├── GoogleMapsService.cs
+│   │   │   └── SmartAllocationService.cs
+│   │   ├── Notifications/
+│   │   │   ├── INotificationStrategy.cs
+│   │   │   ├── INotificationManager.cs
+│   │   │   ├── NotificationManager.cs
+│   │   │   ├── EmailNotificationStrategy.cs
+│   │   │   ├── SMSNotificationStrategy.cs
+│   │   │   └── InAppNotificationStrategy.cs
+│   │   ├── Observers/
+│   │   │   ├── IStatusObserver.cs
+│   │   │   ├── RoomStatusUpdater.cs
+│   │   │   ├── ReportServiceObserver.cs
+│   │   │   └── AdminDashboardObserver.cs
+│   │   ├── Facades/
+│   │   │   └── TenantDashboardFacade.cs
+│   │   ├── DTOs/
+│   │   │   ├── Requests/
+│   │   │   │   ├── LoginRequest.cs
+│   │   │   │   ├── RegisterRequest.cs
+│   │   │   │   ├── CreateApplicationRequest.cs
+│   │   │   │   ├── BookViewingRequest.cs
+│   │   │   │   ├── UploadPaymentRequest.cs
+│   │   │   │   └── CreateMaintenanceRequest.cs
+│   │   │   └── Responses/
+│   │   │       ├── AuthResponse.cs
+│   │   │       ├── PropertyResponse.cs
+│   │   │       ├── RoomResponse.cs
+│   │   │       ├── ApplicationResponse.cs
+│   │   │       ├── LeaseResponse.cs
+│   │   │       ├── PaymentResponse.cs
+│   │   │       ├── MaintenanceResponse.cs
+│   │   │       └── DashboardResponse.cs
+│   │   ├── Middleware/
+│   │   │   ├── ErrorHandlingMiddleware.cs
+│   │   │   ├── RequestLoggingMiddleware.cs
+│   │   │   └── RateLimitingMiddleware.cs
+│   │   ├── Validators/
+│   │   │   ├── LoginRequestValidator.cs
+│   │   │   ├── RegisterRequestValidator.cs
+│   │   │   └── CreateApplicationRequestValidator.cs
+│   │   ├── Extensions/
+│   │   │   ├── ServiceCollectionExtensions.cs
+│   │   │   └── ClaimsPrincipalExtensions.cs
+│   │   ├── Properties/
+│   │   │   └── launchSettings.json
+│   │   ├── appsettings.json
+│   │   ├── appsettings.Development.json
+│   │   ├── appsettings.Staging.json
+│   │   ├── appsettings.Production.json
+│   │   ├── Program.cs
+│   │   └── UniCribz.Api.csproj
+│   │
+│   ├── UniCribz.Data/                      # EF Core Data Layer
+│   │   ├── Entities/
+│   │   │   ├── User.cs
+│   │   │   ├── Visitor.cs
+│   │   │   ├── Tenant.cs
+│   │   │   ├── Admin.cs
+│   │   │   ├── University.cs
+│   │   │   ├── Property.cs
+│   │   │   ├── PropertyImage.cs
+│   │   │   ├── Amenity.cs
+│   │   │   ├── Room.cs
+│   │   │   ├── Application.cs
+│   │   │   ├── ApplicationDocument.cs
+│   │   │   ├── Viewing.cs
+│   │   │   ├── Lease.cs
+│   │   │   ├── Payment.cs
+│   │   │   ├── MaintenanceRequest.cs
+│   │   │   ├── MaintenancePhoto.cs
+│   │   │   ├── Complaint.cs
+│   │   │   ├── Announcement.cs
+│   │   │   ├── Notification.cs
+│   │   │   ├── Document.cs
+│   │   │   └── InventoryItem.cs
+│   │   ├── Enums/
+│   │   │   ├── UserRole.cs
+│   │   │   ├── RoomStatus.cs
+│   │   │   ├── ApplicationStatus.cs
+│   │   │   ├── PaymentStatus.cs
+│   │   │   ├── MaintenanceStatus.cs
+│   │   │   ├── ComplaintStatus.cs
+│   │   │   ├── LeaseStatus.cs
+│   │   │   └── ViewingStatus.cs
+│   │   ├── Context/
+│   │   │   └── UniCribzDbContext.cs
+│   │   ├── Configurations/
+│   │   │   ├── UserConfiguration.cs
+│   │   │   ├── PropertyConfiguration.cs
+│   │   │   ├── RoomConfiguration.cs
+│   │   │   ├── ApplicationConfiguration.cs
+│   │   │   ├── LeaseConfiguration.cs
+│   │   │   ├── PaymentConfiguration.cs
+│   │   │   └── ... (one per entity)
+│   │   ├── Repositories/
+│   │   │   ├── IRepository.cs
+│   │   │   ├── Repository.cs
+│   │   │   ├── IUserRepository.cs
+│   │   │   ├── UserRepository.cs
+│   │   │   ├── IPropertyRepository.cs
+│   │   │   └── PropertyRepository.cs
+│   │   ├── Migrations/
+│   │   │   └── (EF Core generated)
+│   │   ├── Seed/
+│   │   │   └── DataSeeder.cs
+│   │   └── UniCribz.Data.csproj
+│   │
+│   ├── UniCribz.Shared/                    # Shared Models & DTOs
+│   │   ├── DTOs/
+│   │   ├── Constants/
+│   │   │   ├── Roles.cs
+│   │   │   └── Policies.cs
+│   │   ├── Helpers/
+│   │   │   └── PasswordHasher.cs
+│   │   └── UniCribz.Shared.csproj
+│   │
+│   └── UniCribz.Web/                       # ASP.NET Core MVC (Frontend)
+│       ├── Controllers/
+│       │   ├── HomeController.cs
+│       │   ├── PropertyController.cs
+│       │   ├── ApplicationController.cs
+│       │   ├── ViewingController.cs
+│       │   ├── AccountController.cs
+│       │   ├── TenantController.cs
+│       │   └── AdminController.cs
+│       ├── Views/
+│       │   ├── Shared/
+│       │   │   ├── _Layout.cshtml
+│       │   │   ├── _Footer.cshtml
+│       │   │   ├── _Navbar.cshtml
+│       │   │   ├── _Sidebar.cshtml
+│       │   │   ├── _ValidationScriptsPartial.cshtml
+│       │   │   └── Error.cshtml
+│       │   ├── Home/
+│       │   │   └── Index.cshtml
+│       │   ├── Property/
+│       │   │   ├── Search.cshtml
+│       │   │   ├── Details.cshtml
+│       │   │   └── _PropertyCard.cshtml
+│       │   ├── Application/
+│       │   │   ├── Create.cshtml
+│       │   │   └── Status.cshtml
+│       │   ├── Viewing/
+│       │   │   └── Book.cshtml
+│       │   ├── Account/
+│       │   │   ├── Login.cshtml
+│       │   │   ├── Register.cshtml
+│       │   │   └── ForgotPassword.cshtml
+│       │   ├── Tenant/
+│       │   │   ├── Dashboard.cshtml
+│       │   │   ├── Lease.cshtml
+│       │   │   ├── Payments.cshtml
+│       │   │   ├── Maintenance.cshtml
+│       │   │   └── Complaints.cshtml
+│       │   └── Admin/
+│       │       ├── Dashboard.cshtml
+│       │       ├── Properties.cshtml
+│       │       ├── Rooms.cshtml
+│       │       ├── Applications.cshtml
+│       │       ├── Payments.cshtml
+│       │       ├── Maintenance.cshtml
+│       │       ├── Complaints.cshtml
+│       │       └── Reports.cshtml
+│       ├── ViewModels/
+│       │   ├── PropertySearchViewModel.cs
+│       │   ├── PropertyDetailsViewModel.cs
+│       │   ├── TenantDashboardViewModel.cs
+│       │   ├── AdminDashboardViewModel.cs
+│       │   └── LoginViewModel.cs
+│       ├── wwwroot/
+│       │   ├── css/
+│       │   │   ├── site.css
+│       │   │   ├── theme.css
+│       │   │   └── dashboard.css
+│       │   ├── js/
+│       │   │   ├── site.js
+│       │   │   ├── maps.js
+│       │   │   ├── dashboard.js
+│       │   │   └── validation.js
+│       │   ├── images/
+│       │   ├── lib/
+│       │   │   ├── bootstrap/
+│       │   │   ├── jquery/
+│       │   │   └── font-awesome/
+│       │   └── favicon.ico
+│       ├── appsettings.json
+│       ├── Program.cs
+│       └── UniCribz.Web.csproj
+│
+├── tests/
+│   ├── UniCribz.Api.Tests/
+│   │   ├── UnitTests/
+│   │   │   ├── Services/
+│   │   │   ├── Notifications/
+│   │   │   └── Observers/
+│   │   ├── IntegrationTests/
+│   │   │   └── Controllers/
+│   │   └── UniCribz.Api.Tests.csproj
+│   ├── UniCribz.Web.Tests/
+│   │   └── UniCribz.Web.Tests.csproj
+│   └── UniCribz.E2E.Tests/
+│       ├── Playwright/
+│       └── UniCribz.E2E.Tests.csproj
+│
+├── .editorconfig
+├── .gitignore
+├── .gitattributes
+├── Directory.Build.props
+├── UniCribz.sln
+├── global.json
+├── docker-compose.yml
+├── Dockerfile
+├── README.md
+└── LICENSE
+```
+---
+
 ## ✅ Current Project Status
 
 ### Done (Infrastructure & Scaffolding)
