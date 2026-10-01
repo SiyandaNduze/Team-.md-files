@@ -1,6 +1,4 @@
-## 📄 File 5: `README.md` (Root of Repo)
-
-Replace your repo's root `README.md` with this (short, links to full docs):
+## 📄 File 5: `README.md` (Root)
 
 ```markdown
 # UniCribz — Student Accommodation Management System
@@ -22,7 +20,7 @@ cd INSY7315-2026-MOTIVATION
 # 2. Verify .NET 8
 dotnet --list-sdks     # Should show 8.0.x
 
-# 3. Run setup
+# 3. Run setup (first time only)
 powershell -ExecutionPolicy Bypass -File setup/00-run-all.ps1
 
 # 4. Start local dependencies
@@ -36,37 +34,46 @@ cd src/UniCribz.Web && dotnet run
 ```
 
 **Dev URLs:**
+
 | Service | URL |
 |---------|-----|
-| API (Swagger) | `https://localhost:7285/swagger` |
-| API (Health) | `https://localhost:7285/health` |
+| API (Swagger) | `http://localhost:5125/swagger` |
+| API (Health) | `http://localhost:5125/health` |
 | Web Frontend | `https://localhost:7105` |
+| PostgreSQL | `localhost:5432` |
+| Redis | `localhost:6379` |
+
+**Test accounts (seeded):**
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@unicribz.co.za | Admin@123 |
+| Tenant | tenant@unicribz.co.za | Admin@123 |
+| Visitor | visitor@unicribz.co.za | Admin@123 |
 
 ---
 
 ## 👥 Team & Roles
 
-| Name | Role | Branch Prefix | Working Directory |
-|------|------|---------------|-------------------|
-| **Siyanda Nduze** (ST10440706) | Backend Architect & DevOps | `feature/backend-*`, `feature/ci-cd-*` | `src/UniCribz.Api/`, `src/UniCribz.Shared/`, `.github/` |
+| Name | Role | Branch | Directory |
+|------|------|--------|-----------|
+| **Siyanda Nduze** (ST10440706) | Backend Architect & DevOps | `feature/backend-*` | `src/UniCribz.Api/`, `src/UniCribz.Shared/`, `.github/` |
 | **Samkelsiwe Hlatshwayo** (ST10442364) | UI/UX & Frontend | `feature/frontend-*` | `src/UniCribz.Web/` |
 | **Siyabonga Cebekhulu** (ST10440807) | Database & Backend | `feature/database-*` | `src/UniCribz.Data/` |
 | **Anothile Bhengu** (ST10440981) | Integrations & Services | `feature/payment-*`, `feature/google-maps-*` | `src/UniCribz.Api/Notifications/`, `Services/` |
 
-**Per-member instructions:** See `docs/team/1-samkelsiwe-frontend.md`, `2-anothile-integration.md`, `3-siyabonga-database.md`, `4-siyanda-backend-devops.md`.
+**Per-member instructions:** `docs/team/1-samkelsiwe-frontend.md`, `2-anothile-integration.md`, `3-siyabonga-database.md`, `4-siyanda-backend-devops.md`.
 
 ---
 
-## Full File Structure
+## 📁 Full File Structure
 
 ```
 UniCribz-Student-Accommodation-System/
 │
-├── .github/
-│   └── workflows/
-│       ├── ci.yml                              # Lint, build, test on every push
-│       ├── deploy-staging.yml                  # Deploy to Azure staging (guarded)
-│       └── deploy-production.yml               # Blue-green deploy (guarded)
+├── .github/workflows/
+│   ├── ci.yml                              # Lint, build, test
+│   ├── deploy-staging.yml                  # Azure staging (guarded)
+│   └── deploy-production.yml               # Blue-green (guarded)
 │
 ├── docs/
 │   ├── diagrams/
@@ -89,18 +96,18 @@ UniCribz-Student-Accommodation-System/
 │
 ├── src/
 │   │
-│   ├── UniCribz.Api/                           # ASP.NET Core Web API (Backend)
+│   ├── UniCribz.Api/                           # ASP.NET Core Web API
 │   │   ├── Controllers/
 │   │   │   ├── AuthController.cs               # register, login, me, refresh, logout
-│   │   │   ├── PropertyController.cs           # search, get, create, update, delete, rooms
-│   │   │   ├── ApplicationController.cs        # submit, list, get, approve, upload doc
-│   │   │   ├── ViewingController.cs            # book, list, approve, available slots
-│   │   │   ├── LeaseController.cs              # create, sign, terminate, list, mine
-│   │   │   ├── PaymentController.cs            # initiate, upload proof, verify, receipt
-│   │   │   ├── MaintenanceController.cs        # submit, list, mine, assign, status
-│   │   │   ├── ComplaintController.cs          # submit, list, mine, resolve
-│   │   │   ├── AnnouncementController.cs       # public list, admin list, create, delete
-│   │   │   ├── NotificationController.cs       # list, unread count, mark read
+│   │   │   ├── PropertyController.cs           # search, CRUD, rooms
+│   │   │   ├── ApplicationController.cs        # submit, approve, upload doc
+│   │   │   ├── ViewingController.cs            # book, approve, available slots
+│   │   │   ├── LeaseController.cs              # create, sign, terminate
+│   │   │   ├── PaymentController.cs            # initiate, upload, verify, receipt
+│   │   │   ├── MaintenanceController.cs        # submit, assign, status
+│   │   │   ├── ComplaintController.cs          # submit, resolve
+│   │   │   ├── AnnouncementController.cs       # create, list, delete
+│   │   │   ├── NotificationController.cs       # list, unread, mark read
 │   │   │   ├── ReportController.cs             # occupancy, payments, maintenance, dashboard
 │   │   │   └── GoogleMapsController.cs         # geocode, nearby
 │   │   │
@@ -139,59 +146,23 @@ UniCribz-Student-Accommodation-System/
 │   │   │   ├── SMSNotificationStrategy.cs
 │   │   │   └── InAppNotificationStrategy.cs
 │   │   │
-│   │   ├── Observers/                          # (placeholders)
-│   │   │   ├── IStatusObserver.cs
-│   │   │   ├── RoomStatusUpdater.cs
-│   │   │   ├── ReportServiceObserver.cs
-│   │   │   └── AdminDashboardObserver.cs
+│   │   ├── Observers/                          # ✅ Observer pattern live
+│   │   │   ├── IStatusObserver.cs              # Event + interface
+│   │   │   ├── RoomStatusUpdater.cs            # Frees room on MOVE_OUT
+│   │   │   ├── ReportServiceObserver.cs        # Invalidates reports
+│   │   │   └── AdminDashboardObserver.cs       # Invalidates dashboard
 │   │   │
 │   │   ├── Facades/
-│   │   │   └── TenantDashboardFacade.cs
+│   │   │   └── TenantDashboardFacade.cs        # Placeholder
 │   │   │
 │   │   ├── DTOs/
-│   │   │   ├── Requests/
-│   │   │   │   ├── LoginRequest.cs
-│   │   │   │   ├── RegisterRequest.cs
-│   │   │   │   ├── CreatePropertyRequest.cs
-│   │   │   │   ├── CreateRoomRequest.cs
-│   │   │   │   ├── CreateApplicationRequest.cs
-│   │   │   │   ├── BookViewingRequest.cs
-│   │   │   │   ├── CreateLeaseRequest.cs
-│   │   │   │   ├── InitiatePaymentRequest.cs
-│   │   │   │   ├── UploadProofOfPaymentRequest.cs
-│   │   │   │   ├── VerifyPaymentRequest.cs
-│   │   │   │   ├── CreateMaintenanceRequest.cs
-│   │   │   │   ├── AssignMaintenanceRequest.cs
-│   │   │   │   ├── UpdateMaintenanceStatusRequest.cs
-│   │   │   │   ├── CreateComplaintRequest.cs
-│   │   │   │   ├── UpdateComplaintStatusRequest.cs
-│   │   │   │   ├── CreateAnnouncementRequest.cs
-│   │   │   │   └── UploadDocumentRequest.cs
-│   │   │   │
-│   │   │   └── Responses/
-│   │   │       ├── AuthResponse.cs
-│   │   │       ├── PropertyResponse.cs
-│   │   │       ├── RoomResponse.cs
-│   │   │       ├── ApplicationResponse.cs
-│   │   │       ├── ViewingResponse.cs
-│   │   │       ├── SlotResponse.cs
-│   │   │       ├── LeaseResponse.cs
-│   │   │       ├── PaymentResponse.cs
-│   │   │       ├── MaintenanceResponse.cs
-│   │   │       ├── MaintenanceReportResponse.cs
-│   │   │       ├── ComplaintResponse.cs
-│   │   │       ├── AnnouncementResponse.cs
-│   │   │       ├── NotificationResponse.cs
-│   │   │       ├── OccupancyReportResponse.cs
-│   │   │       ├── PaymentReportResponse.cs
-│   │   │       ├── DashboardReportResponse.cs
-│   │   │       ├── DashboardResponse.cs
-│   │   │       └── GeocodeResponse.cs
+│   │   │   ├── Requests/                       # 17 request DTOs
+│   │   │   └── Responses/                      # 18 response DTOs
 │   │   │
 │   │   ├── Middleware/
-│   │   │   ├── ErrorHandlingMiddleware.cs      # global exception → JSON
-│   │   │   ├── RequestLoggingMiddleware.cs     # Serilog timing
-│   │   │   └── RateLimitingMiddleware.cs       # 60 req/min per IP
+│   │   │   ├── ErrorHandlingMiddleware.cs
+│   │   │   ├── RequestLoggingMiddleware.cs
+│   │   │   └── RateLimitingMiddleware.cs
 │   │   │
 │   │   ├── Validators/
 │   │   │   ├── LoginRequestValidator.cs
@@ -199,7 +170,7 @@ UniCribz-Student-Accommodation-System/
 │   │   │   └── CreateApplicationRequestValidator.cs
 │   │   │
 │   │   ├── Extensions/
-│   │   │   ├── ServiceCollectionExtensions.cs  # DI: all services registered
+│   │   │   ├── ServiceCollectionExtensions.cs
 │   │   │   └── ClaimsPrincipalExtensions.cs
 │   │   │
 │   │   ├── Mappings/
@@ -210,157 +181,59 @@ UniCribz-Student-Accommodation-System/
 │   │   │
 │   │   ├── appsettings.json
 │   │   ├── appsettings.Development.json
-│   │   ├── UniCribz.Api.http                   # ~60 integration tests
+│   │   ├── UniCribz.Api.http                   # ~60 tests
 │   │   ├── Program.cs
 │   │   └── UniCribz.Api.csproj
 │   │
 │   ├── UniCribz.Data/                          # EF Core Data Layer
-│   │   ├── Entities/
-│   │   │   ├── User.cs                         # abstract, TPH
-│   │   │   ├── Visitor.cs
-│   │   │   ├── Tenant.cs
-│   │   │   ├── Admin.cs
-│   │   │   ├── University.cs
-│   │   │   ├── Property.cs
-│   │   │   ├── PropertyImage.cs
-│   │   │   ├── Amenity.cs
-│   │   │   ├── Room.cs
-│   │   │   ├── Application.cs
-│   │   │   ├── ApplicationDocument.cs
-│   │   │   ├── Viewing.cs
-│   │   │   ├── Lease.cs
-│   │   │   ├── Payment.cs
-│   │   │   ├── MaintenanceRequest.cs
-│   │   │   ├── MaintenancePhoto.cs
-│   │   │   ├── Complaint.cs
-│   │   │   ├── Announcement.cs
-│   │   │   ├── Notification.cs
-│   │   │   ├── Document.cs
-│   │   │   └── InventoryItem.cs
-│   │   │
-│   │   ├── Enums/
-│   │   │   ├── UserRole.cs
-│   │   │   ├── RoomStatus.cs
-│   │   │   ├── ApplicationStatus.cs
-│   │   │   ├── PaymentStatus.cs
-│   │   │   ├── MaintenanceStatus.cs
-│   │   │   ├── ComplaintStatus.cs
-│   │   │   ├── LeaseStatus.cs
-│   │   │   └── ViewingStatus.cs
-│   │   │
+│   │   ├── Entities/                           # 21 entities
+│   │   ├── Enums/                              # 8 enums
 │   │   ├── Context/
-│   │   │   └── UniCribzDbContext.cs            # 22 DbSets, TPH, ApplyConfigurationsFromAssembly
-│   │   │
-│   │   ├── Configurations/
-│   │   │   ├── UserConfiguration.cs
-│   │   │   ├── PropertyConfiguration.cs
-│   │   │   ├── PropertyImageConfiguration.cs
-│   │   │   ├── RoomConfiguration.cs
-│   │   │   ├── AmenityConfiguration.cs
-│   │   │   ├── UniversityConfiguration.cs
-│   │   │   ├── ApplicationConfiguration.cs
-│   │   │   ├── ApplicationDocumentConfiguration.cs
-│   │   │   ├── ViewingConfiguration.cs
-│   │   │   ├── LeaseConfiguration.cs
-│   │   │   ├── PaymentConfiguration.cs
-│   │   │   ├── MaintenanceRequestConfiguration.cs
-│   │   │   ├── MaintenancePhotoConfiguration.cs
-│   │   │   ├── ComplaintConfiguration.cs
-│   │   │   ├── AnnouncementConfiguration.cs
-│   │   │   ├── NotificationConfiguration.cs
-│   │   │   ├── DocumentConfiguration.cs
-│   │   │   └── InventoryItemConfiguration.cs
-│   │   │
-│   │   ├── Repositories/
-│   │   │   ├── IRepository.cs
-│   │   │   ├── Repository.cs
-│   │   │   ├── IUserRepository.cs
-│   │   │   ├── UserRepository.cs
-│   │   │   ├── IPropertyRepository.cs
-│   │   │   └── PropertyRepository.cs
-│   │   │
+│   │   │   └── UniCribzDbContext.cs            # 22 DbSets, TPH
+│   │   ├── Configurations/                     # 18 configs
+│   │   ├── Repositories/                       # Repository pattern
 │   │   ├── Migrations/
 │   │   │   ├── 20260930143546_InitialCreate.cs
 │   │   │   ├── 20261001083400_SecondMigration.cs
 │   │   │   └── UniCribzDbContextModelSnapshot.cs
-│   │   │
 │   │   ├── Seed/
-│   │   │   └── DataSeeder.cs                   # 3 users, 3 universities, 5 amenities, 1 property, 3 rooms
-│   │   │
+│   │   │   └── DataSeeder.cs                   # 3 users, 3 unis, 5 amenities, property, 3 rooms
 │   │   └── UniCribz.Data.csproj
 │   │
-│   ├── UniCribz.Shared/                        # Shared Models & Utilities
+│   ├── UniCribz.Shared/
 │   │   ├── Constants/
 │   │   │   ├── Roles.cs
 │   │   │   └── Policies.cs
 │   │   ├── Helpers/
-│   │   │   ├── PasswordHasher.cs               # BCrypt wrapper
-│   │   │   └── JwtTokenGenerator.cs            # primitive-only signature (no Data ref)
+│   │   │   ├── PasswordHasher.cs
+│   │   │   └── JwtTokenGenerator.cs
 │   │   └── UniCribz.Shared.csproj
 │   │
 │   └── UniCribz.Web/                           # ASP.NET Core MVC (Frontend)
-│       ├── Controllers/
-│       │   ├── HomeController.cs
-│       │   ├── PropertyController.cs           # (placeholder)
-│       │   ├── ApplicationController.cs        # (placeholder)
-│       │   ├── ViewingController.cs            # (placeholder)
-│       │   ├── AccountController.cs            # (placeholder)
-│       │   ├── TenantController.cs             # (placeholder)
-│       │   └── AdminController.cs              # (placeholder)
+│       ├── Controllers/                        # Mostly placeholders (Sam to build)
 │       ├── Views/
-│       │   ├── Shared/
-│       │   │   └── _Layout.cshtml              # UniCribz theme applied
-│       │   ├── Home/
-│       │   │   ├── Index.cshtml
-│       │   │   └── Privacy.cshtml
-│       │   ├── Property/
-│       │   │   ├── Search.cshtml               # (placeholder)
-│       │   │   └── Details.cshtml              # (placeholder)
-│       │   ├── Application/
-│       │   │   └── Create.cshtml               # (placeholder)
-│       │   ├── Viewing/
-│       │   │   └── Book.cshtml                 # (placeholder)
-│       │   ├── Account/
-│       │   │   ├── Login.cshtml                # (placeholder)
-│       │   │   └── Register.cshtml             # (placeholder)
-│       │   ├── Tenant/
-│       │   │   └── Dashboard.cshtml            # (placeholder)
-│       │   └── Admin/
-│       │       └── Dashboard.cshtml            # (placeholder)
-│       ├── ViewModels/
-│       │   ├── PropertySearchViewModel.cs
-│       │   ├── PropertyDetailsViewModel.cs
-│       │   ├── TenantDashboardViewModel.cs
-│       │   ├── AdminDashboardViewModel.cs
-│       │   └── LoginViewModel.cs
-│       ├── Services/
-│       │   ├── IApiClient.cs
-│       │   └── ApiClient.cs
+│       │   ├── Shared/_Layout.cshtml           # UniCribz theme applied
+│       │   ├── Home/                           # Index.cshtml, Privacy.cshtml
+│       │   ├── Property/                       # Placeholders
+│       │   ├── Application/                    # Placeholder
+│       │   ├── Viewing/                        # Placeholder
+│       │   ├── Account/                        # Placeholders
+│       │   ├── Tenant/                         # Placeholder
+│       │   └── Admin/                          # Placeholder
+│       ├── ViewModels/                         # 5 placeholders
+│       ├── Services/                           # IApiClient, ApiClient placeholders
 │       ├── wwwroot/
-│       │   ├── css/
-│       │   │   └── site.css                    # #2C3E50 / #18BC9C theme
-│       │   ├── js/
-│       │   │   └── site.js
-│       │   ├── lib/                            # bootstrap, jquery (default template)
-│       │   └── favicon.ico
+│       │   ├── css/site.css                    # #2C3E50 / #18BC9C
+│       │   ├── js/site.js
+│       │   └── lib/                            # bootstrap, jquery
 │       ├── appsettings.json                    # Api:BaseUrl → http://localhost:5125
 │       ├── Program.cs
 │       └── UniCribz.Web.csproj
 │
 ├── tests/
 │   ├── UniCribz.Api.Tests/
-│   │   ├── UnitTests/
-│   │   │   ├── Services/
-│   │   │   ├── Notifications/
-│   │   │   └── Observers/
-│   │   ├── IntegrationTests/
-│   │   │   └── Controllers/
-│   │   └── UniCribz.Api.Tests.csproj
 │   ├── UniCribz.Web.Tests/
-│   │   └── UniCribz.Web.Tests.csproj
 │   └── UniCribz.E2E.Tests/
-│       ├── Playwright/
-│       └── UniCribz.E2E.Tests.csproj
 │
 ├── .editorconfig
 ├── .gitattributes
@@ -373,47 +246,52 @@ UniCribz-Student-Accommodation-System/
 ├── README.md
 └── LICENSE
 ```
+
 ---
 
 ## ✅ Current Project Status
 
-### Done (Infrastructure & Scaffolding)
+### Backend — 100% Complete and Tested
 
 | Area | Status |
 |------|--------|
-| Solution + 7 projects | ✅ Created |
-| All NuGet packages | ✅ Installed |
-| Folder structure (46 folders) | ✅ Created |
-| Placeholder classes (141 files) | ✅ Created |
-| API `Program.cs` (JWT, EF, Redis, Swagger) | ✅ Configured |
-| Web `Program.cs` (MVC, HttpClient) | ✅ Configured |
-| `appsettings.json` (both projects) | ✅ Configured with URLs |
-| `_Layout.cshtml` theme + site.css | ✅ Applied |
-| `UniCribzDbContext` scaffold | ✅ Created |
-| `docker-compose.yml` (Postgres + Redis) | ✅ Ready |
-| GitHub Actions (CI, staging, prod) | ✅ Created (deploys guarded on Azure) |
-| `setup/` automation scripts | ✅ Created |
+| Solution + 7 projects | ✅ |
+| All NuGet packages | ✅ |
+| Full folder structure | ✅ |
+| API `Program.cs` (JWT, EF, Redis, Swagger, AutoMapper, FluentValidation) | ✅ |
+| Data layer (21 entities, 8 enums, 18 EF configs) | ✅ |
+| 2 EF migrations applied | ✅ |
+| 20 tables in PostgreSQL | ✅ |
+| Repository pattern | ✅ |
+| Data seeder | ✅ |
+| Auth: register, login, me, refresh, logout | ✅ |
+| Property + Room: search, CRUD, add room | ✅ |
+| Application: submit, approve, upload doc | ✅ |
+| Viewing: book, approve, available slots | ✅ |
+| Lease: create, sign, terminate | ✅ |
+| Payment: initiate, upload, verify, receipt | ✅ |
+| Maintenance: submit, assign, complete | ✅ |
+| Complaint: submit, resolve | ✅ |
+| Announcement: create, list, delete | ✅ |
+| Notification: list, unread, mark read | ✅ |
+| Report: occupancy, payments, maintenance, dashboard | ✅ |
+| **Observer pattern** (fires on lease termination) | ✅ |
+| Middleware (error, logging, rate limiting) | ✅ |
+| ~60 integration tests in `.http` file | ✅ |
 
-**Build status:** `dotnet build` → ✅ 0 Errors, 0 Warnings
-**Test status:** `dotnet test` → ✅ 3 tests pass
+**Build status:** `dotnet build` → **0 Errors, 0 Warnings**
 
-### Not Yet Done (Your Work)
+### Remaining Work
 
-| Area | Status |
-|------|--------|
-| Entity properties + relationships | ⏳ Siyabonga |
-| EF Core migration #1 | ⏳ Siyabonga |
-| Enums filled in | ⏳ Siyabonga |
-| Auth endpoints (register + login) | ⏳ Siyanda |
-| Property endpoints | ⏳ Siyanda |
-| JWT generation & validation | ⏳ Siyanda |
-| Notification Strategy Pattern | ⏳ Anothile |
-| Payment integration (Stripe) | ⏳ Anothile |
-| Google Maps geocoding | ⏳ Anothile |
-| All Razor views | ⏳ Samkelsiwe |
-| Frontend controllers | ⏳ Samkelsiwe |
-| Azure infrastructure | ⏳ Siyanda (Week 3-4) |
-| GitHub secrets (Azure) | ⏳ Siyanda (Week 3-4) |
+| Area | Owner | Status |
+|------|-------|--------|
+| Frontend UI (all views + controllers) | Samkelsiwe | ⏳ |
+| Strategy Pattern (SendGrid/Twilio/InApp) | Anothile | ⏳ |
+| Google Maps service implementation | Anothile | ⏳ |
+| Stripe payment integration | Anothile | ⏳ |
+| `docs/data-migration-plan.md` | Siyabonga | ⏳ |
+| Documentation files (`docs/team/*`, `docs/README-full.md`) | Siyanda | ⏳ |
+| Azure deployment (Week 3-4) | Siyanda | ⏳ |
 
 ---
 
@@ -421,35 +299,21 @@ UniCribz-Student-Accommodation-System/
 
 ```
 main                    ← production-ready, tagged releases only
-└── develop             ← integration branch, deploys to staging
+└── develop             ← integration branch
     ├── feature/frontend-public-website-setup    (Samkelsiwe)
     ├── feature/database-schema-design           (Siyabonga)
     ├── feature/payment-notification-logic       (Anothile)
     └── feature/backend-api-development          (Siyanda)
 ```
 
-**Branch protection (setup on GitHub):**
-- `main`: require PR + 1 approval + CI pass
-- `develop`: require PR + 1 approval + CI pass
-
-**Commit convention:**
-```
-feat:       New feature
-feat(web):  Feature scoped to a subproject
-fix:        Bug fix
-docs:       Documentation
-refactor:   Code restructuring
-test:       Adding tests
-chore:      Maintenance
-```
+**Commit convention:** `feat:` | `fix:` | `docs:` | `refactor:` | `test:` | `chore:`
 
 **Daily workflow:**
 ```bash
-git checkout develop
-git pull
+git checkout develop && git pull
 git checkout feature/your-branch
 git merge develop
-# ... work ...
+# work...
 git add . && git commit -m "feat: ..."
 git push
 ```
@@ -478,10 +342,10 @@ Layered (N-Tier) with clear separation:
 ```
 
 **Design patterns used:**
-- Strategy (Notification channels)
-- Observer (Room status on tenant move-out)
-- Façade (Tenant dashboard aggregation)
-- Repository (Data access)
+- **Strategy** — Notification channels (Email, SMS, In-App) — `Notifications/*`
+- **Observer** — Auto-update on tenant move-out — `Observers/*` ✅ live
+- **Façade** — Tenant dashboard aggregation — `Facades/*`
+- **Repository** — Data access — `Data/Repositories/*`
 
 ---
 
@@ -491,19 +355,19 @@ Layered (N-Tier) with clear separation:
 |-------|------|
 | Backend | .NET 8, ASP.NET Core, C# 12 |
 | Frontend | ASP.NET Core MVC, Razor, Bootstrap 5.3 |
-| Database | PostgreSQL 15 (Azure Flexible Server) |
-| Cache | Redis 7 (Azure Cache) |
-| Storage | Azure Blob Storage |
+| Database | PostgreSQL 15 |
+| Cache | Redis 7 |
+| Storage | Azure Blob Storage (staged) |
 | Auth | JWT Bearer + RBAC |
 | CI/CD | GitHub Actions |
-| Cloud | Microsoft Azure |
+| Cloud | Microsoft Azure (deferred) |
 | Testing | xUnit, Moq, FluentAssertions, Playwright |
 
 ---
 
 ## 📚 Full Documentation
 
-- **Complete project README:** [`docs/README-full.md`](docs/README-full.md) — 24 sections covering architecture, security, deployment, costs, change management
+- **Full project README:** [`docs/README-full.md`](docs/README-full.md)
 - **Team instructions:** `docs/team/*.md`
 - **Setup scripts:** `setup/README.md`
 - **Prototype:** https://github.com/SiyandaNduze/UniCribz-Web-app.git
@@ -516,11 +380,12 @@ Layered (N-Tier) with clear separation:
 |-------|-----|
 | `dotnet: command not found` | Install .NET 8 SDK |
 | Build fails after clone | Run `setup/00-run-all.ps1` |
-| `dotnet --version` shows 10.x | Repo has `global.json` pinning 8.0 |
+| `dotnet --version` shows 10.x | Repo `global.json` pins 8.0 |
 | Docker containers not starting | Open Docker Desktop first |
+| API can't connect to DB | `docker-compose up -d` and wait 12s |
 | HTTPS cert warnings | `dotnet dev-certs https --trust` |
-| CI fails on `dotnet format` | It's `continue-on-error` — ignore |
-| Azure deploy fails | Add the 4 publish profiles + credentials to GitHub secrets |
+| Frontend can't reach API | Verify `Api:BaseUrl` in `src/UniCribz.Web/appsettings.json` |
+| Azure deploy fails | Add the 5 secrets to GitHub |
 
 ---
 
@@ -530,40 +395,5 @@ See `docs/declaration-of-authenticity.md` for the signed declarations from all 4
 
 ---
 
-**Last Updated:** September 2026
+**Last Updated:** 1 October 2026
 **Maintained by:** UniCribz Development Team
-```
-
----
-
-## 📌 How to Use These Files
-
-1. **Create the folders:**
-   ```powershell
-   New-Item -ItemType Directory -Path "docs/team" -Force
-   New-Item -ItemType Directory -Path "docs/research" -Force
-   New-Item -ItemType Directory -Path "docs/deployment" -Force
-   New-Item -ItemType Directory -Path "docs/security" -Force
-   ```
-
-2. **Save each file** at:
-   - `docs/team/1-samkelsiwe-frontend.md`
-   - `docs/team/2-anothile-integration.md`
-   - `docs/team/3-siyabonga-database.md`
-   - `docs/team/4-siyanda-backend-devops.md`
-   - `README.md` (replace root)
-
-3. **Move the full README you already have** to `docs/README-full.md` so nothing is lost.
-
-4. **Commit:**
-   ```powershell
-   git add docs/ README.md
-   git commit -m "docs: add per-member onboarding guides and updated root README"
-   git push
-   ```
-
-5. **Send each teammate the link to their specific file** on GitHub:
-   - Samkelsiwe → `docs/team/1-samkelsiwe-frontend.md`
-   - Anothile → `docs/team/2-anothile-integration.md`
-   - Siyabonga → `docs/team/3-siyabonga-database.md`
-   - You → keep `docs/team/4-siyanda-backend-devops.md` for reference

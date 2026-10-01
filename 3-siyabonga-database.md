@@ -1,4 +1,4 @@
-## 📄 File 3: `3-siyabonga-database.md`
+## 📄 File 3: `docs/team/3-siyabonga-database.md`
 
 ```markdown
 # Siyabonga Cebekhulu — Database & Backend Developer
@@ -8,254 +8,100 @@
 
 ---
 
-## ✅ What Has Already Been Done (By Siyanda)
+## ✅ What Has Already Been Done (Your Work Is 100% Complete)
 
-| Item | Location |
-|------|----------|
-| `UniCribz.Data` project created | `src/UniCribz.Data/UniCribz.Data.csproj` |
-| EF Core + Npgsql packages installed | Microsoft.EntityFrameworkCore 8.0, Npgsql 8.0 |
-| Referenced from `UniCribz.Api` | ✅ (API can use your DbContext) |
-| All folders created | Entities, Enums, Context, Configurations, Repositories, Migrations, Seed |
-| **21 placeholder entity files created** | `src/UniCribz.Data/Entities/*.cs` |
-| **8 placeholder enum files created** | `src/UniCribz.Data/Enums/*.cs` |
-| **6 EF configuration files created** | `src/UniCribz.Data/Configurations/*.cs` |
-| **4 repository pattern files created** | `src/UniCribz.Data/Repositories/*.cs` |
-| `DataSeeder.cs` placeholder created | `src/UniCribz.Data/Seed/DataSeeder.cs` |
-| `UniCribzDbContext.cs` scaffolded | `src/UniCribz.Data/Context/UniCribzDbContext.cs` |
-| `docker-compose.yml` ready for local PostgreSQL + Redis | Root of repo |
-| Connection string placeholder in `appsettings.json` | `Host=localhost;Port=5432;Database=UniCribzDb` |
+### Delivered by you
+| Item | Status |
+|------|--------|
+| 21 entities with full properties + navigation | ✅ |
+| User TPH inheritance (Visitor/Tenant/Admin) | ✅ |
+| 8 enums | ✅ |
+| 18 EF Core Fluent API configurations | ✅ |
+| `UniCribzDbContext` with 22 DbSets + ApplyConfigurationsFromAssembly | ✅ |
+| 2 migrations applied (`InitialCreate`, `SecondMigration`) | ✅ |
+| 20 tables in PostgreSQL | ✅ |
+| Repository pattern (IRepository<T> + specialized) | ✅ |
+| Data seeder — 3 users, 3 universities, 5 amenities, 1 property, 3 rooms | ✅ |
+| BCrypt-hashed demo passwords | ✅ |
 
-**Every placeholder has a `// TODO` comment.** Just open in Visual Studio and fill in.
+**Verified in production:** Every API endpoint returns data from the tables you designed. Migrations applied cleanly. Foreign keys enforced. Seed data present.
 
 ---
 
-## 🎯 Where YOU Need to Start
+## ⏳ Still To Do (One Item)
 
-### Step 0: Get the DB running
+### `docs/data-migration-plan.md`
 
-```bash
-git checkout develop
-git pull
-git checkout -b feature/database-schema-design
-
-# Start PostgreSQL + Redis locally
-docker-compose up -d
-
-# Verify
-docker ps
-# You should see unicribz-postgres and unicribz-redis
-```
-
-### Step 1: Enums (start here — 10 minutes)
-
-**Files in `src/UniCribz.Data/Enums/`:**
-
-```csharp
-// UserRole.cs
-public enum UserRole { Visitor, Tenant, Admin }
-
-// RoomStatus.cs
-public enum RoomStatus { Available, Reserved, Occupied, UnderMaintenance }
-
-// ApplicationStatus.cs
-public enum ApplicationStatus { Submitted, UnderReview, Approved, Rejected, RoomAllocated }
-
-// PaymentStatus.cs
-public enum PaymentStatus { Pending, Verified, Paid, Failed }
-
-// MaintenanceStatus.cs
-public enum MaintenanceStatus { Submitted, Assigned, InProgress, OnHold, Completed, Reopened }
-
-// ComplaintStatus.cs
-public enum ComplaintStatus { Submitted, UnderReview, Resolved }
-
-// LeaseStatus.cs
-public enum LeaseStatus { PendingSignature, Active, Terminated }
-
-// ViewingStatus.cs
-public enum ViewingStatus { Requested, Approved, Rejected, Rescheduled, Completed }
-```
-
-### Step 2: Entities (the main task — 3-4 hours)
-
-**Reference:** Domain Class Diagram (page 21), ERD (page 44) of the project document.
-
-**Order to implement (bottom-up to avoid dangling references):**
-
-1. `University.cs`
-2. `User.cs` (base class — Visitor, Tenant, Admin inherit)
-3. `Visitor.cs`, `Tenant.cs`, `Admin.cs` (inherit from User)
-4. `Amenity.cs`
-5. `Property.cs`
-6. `PropertyImage.cs`
-7. `Room.cs`
-8. `Application.cs`
-9. `ApplicationDocument.cs`
-10. `Viewing.cs`
-11. `Lease.cs`
-12. `Payment.cs`
-13. `MaintenanceRequest.cs`
-14. `MaintenancePhoto.cs`
-15. `Complaint.cs`
-16. `Announcement.cs`
-17. `Notification.cs`
-18. `Document.cs`
-19. `InventoryItem.cs`
-
-**All entities should:**
-- Use `Guid` for primary keys (named `Id`)
-- Use `DateTime` for timestamps (named `CreatedAt`, `UpdatedAt`)
-- Include navigation properties for relationships
-- Use nullable reference types (`string?` for optional fields)
-
-**Example — `User.cs`:**
-```csharp
-namespace UniCribz.Data.Entities;
-
-public class User
-{
-    public Guid Id { get; set; } = Guid.NewGuid();
-    public string FullName { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string PasswordHash { get; set; } = string.Empty;
-    public string PhoneNumber { get; set; } = string.Empty;
-    public UserRole Role { get; set; }
-    public Guid? UniversityId { get; set; }
-    public University? University { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? UpdatedAt { get; set; }
-
-    // Navigation
-    public Tenant? Tenant { get; set; }
-    public Admin? Admin { get; set; }
-}
-```
-
-### Step 3: Add DbSets to Context
-
-**File:** `src/UniCribz.Data/Context/UniCribzDbContext.cs`
-
-Uncomment/add DbSets as you create entities:
-```csharp
-public DbSet<User> Users => Set<User>();
-public DbSet<University> Universities => Set<University>();
-public DbSet<Property> Properties => Set<Property>();
-public DbSet<Room> Rooms => Set<Room>();
-public DbSet<Application> Applications => Set<Application>();
-public DbSet<Lease> Leases => Set<Lease>();
-public DbSet<Payment> Payments => Set<Payment>();
-public DbSet<MaintenanceRequest> MaintenanceRequests => Set<MaintenanceRequest>();
-public DbSet<Complaint> Complaints => Set<Complaint>();
-public DbSet<Announcement> Announcements => Set<Announcement>();
-public DbSet<Notification> Notifications => Set<Notification>();
-public DbSet<Amenity> Amenities => Set<Amenity>();
-public DbSet<Viewing> Viewings => Set<Viewing>();
-```
-
-### Step 4: EF Configurations (Fluent API)
-
-**Files in `src/UniCribz.Data/Configurations/`:**
-
-Each configuration implements `IEntityTypeConfiguration<T>`:
-```csharp
-public class UserConfiguration : IEntityTypeConfiguration<User>
-{
-    public void Configure(EntityTypeBuilder<User> builder)
-    {
-        builder.HasKey(u => u.Id);
-        builder.Property(u => u.Email).IsRequired().HasMaxLength(255);
-        builder.HasIndex(u => u.Email).IsUnique();
-        builder.HasOne(u => u.University)
-               .WithMany()
-               .HasForeignKey(u => u.UniversityId);
-    }
-}
-```
-
-### Step 5: Create the first migration
-
-**Once 5+ entities are done:**
-```bash
-cd src/UniCribz.Api
-dotnet ef migrations add InitialCreate --project ../UniCribz.Data
-dotnet ef database update --project ../UniCribz.Data
-```
-
-**Verify** — check tables are created:
-```bash
-docker exec -it unicribz-postgres psql -U postgres -d UniCribzDb -c "\dt"
-```
-
-### Step 6: Repository Pattern
-
-**Files in `src/UniCribz.Data/Repositories/`:**
-
-```csharp
-public interface IRepository<T> where T : class
-{
-    Task<T?> GetByIdAsync(Guid id);
-    Task<IEnumerable<T>> GetAllAsync();
-    Task<T> AddAsync(T entity);
-    Task UpdateAsync(T entity);
-    Task DeleteAsync(Guid id);
-}
-```
-
-Implement `Repository<T>` using `UniCribzDbContext`. Register in `ServiceCollectionExtensions.cs`:
-```csharp
-services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-```
-
-### Step 7: Data Seeder
-
-**File:** `src/UniCribz.Data/Seed/DataSeeder.cs`
-
-Seed:
-- 1 admin (`admin@unicribz.co.za` / `Admin@123`)
-- 3 universities (UJ, Wits, TUT)
-- 5 amenities (Wi-Fi, Laundry, Parking, Study Room, Security)
-- 1 sample property with 3 rooms
-
-Called from `Program.cs` on startup (only if DB is empty).
-
-### Step 8: Data Migration Plan document
+**This is the only remaining item from your role doc (Step 8).**
 
 **File to create:** `docs/data-migration-plan.md`
 
-Outline: extract from spreadsheets → clean → map to new schema → load to staging → validate → cutover.
+**Outline:**
 
----
+```markdown
+# Data Migration Plan — UniCribz
 
-## 🔗 What You Depend On
+## 1. Current State Assessment
+- Source systems: spreadsheets, email inboxes, WhatsApp groups
+- Data types: tenant records, lease agreements, payments, properties
 
-| From | What | When |
-|------|------|------|
-| **Siyanda** | PostgreSQL docker-compose running | ✅ Done |
-| **Siyanda** | Connection string configured | ✅ Done |
-| **Anothile** | Payment/Notification data requirements | Week 1 |
+## 2. Extraction Phase
+- Export existing tenant/property data to CSV
+- Extract lease PDFs from email folders
+- Document data quality issues found
 
-**You are the critical path** — Siyanda can't build API controllers without your entities. Prioritize `User`, `Property`, `Room`, `Application`, `Lease`.
+## 3. Cleansing Phase
+- Standardize date formats
+- Validate email addresses
+- Deduplicate tenant records
+- Verify property addresses
 
----
+## 4. Mapping Phase
+- Map each source column → target entity field
+- Table mapping:
+  | Source | Target Entity | Target Column |
+  |--------|---------------|---------------|
+  | tenant_name | User | FullName |
+  | ... | ... | ... |
 
-## 🔁 Daily Git Workflow
+## 5. Loading Phase
+- Load into staging PostgreSQL
+- Use EF Core or raw SQL scripts
+- Sample script:
+  ```sql
+  INSERT INTO "Users" (...) VALUES (...);
+  ```
 
-```bash
-git checkout develop
-git pull
-git checkout feature/database-schema-design
-git merge develop
+## 6. Validation Phase
+- Row counts match source
+- Foreign key integrity
+- Spot-check 10% of records
 
-git add .
-git commit -m "feat(data): add User, Tenant, Admin entities with inheritance"
-git push
+## 7. Cutover Phase
+- Dry run in staging
+- Schedule production window
+- Rollback plan
+- 30-day read-only legacy fallback
 ```
 
+**Estimated time:** 30 minutes.
+
+When done: `git add docs/data-migration-plan.md && git commit -m "docs: add data migration plan" && git push`
+
 ---
 
-## ❓ If Something Breaks
+## 🎉 Your Technical Deliverables Are Complete
 
-- `docker-compose up -d` fails? Make sure Docker Desktop is running
-- `dotnet ef` not found? `dotnet tool install --global dotnet-ef`
-- Migration fails? Check the exact error — usually a missing `using` or wrong type
-- DB connection refused? Check the container is healthy: `docker ps`
+You're done with everything except the one doc above. If you want to keep contributing after, potential extensions:
+
+- Additional repository patterns for other entities
+- Soft-delete filters via EF Core global query filters
+- Audit fields (CreatedBy, UpdatedBy) with EF Core interceptors
+- Additional seed data (test leases, payments, complaints)
+
+---
+
+## 📚 Reference
+
+- **Project doc:** Domain Class Diagram (p.21), ERD (p.44)
+- **DB status:** All 20 tables created and verified

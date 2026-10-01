@@ -1,4 +1,4 @@
-## 📄 File 4: `4-siyanda-backend-devops.md`
+## 📄 File 4: `docs/team/4-siyanda-backend-devops.md`
 
 ```markdown
 # Siyanda Nduze — Backend Architect & DevOps Lead
@@ -8,299 +8,131 @@
 
 ---
 
-## ✅ What Has Already Been Done (By You)
-
-Everything below is **already in the repository**:
+## ✅ COMPLETE — Every Module Delivered
 
 ### Repository & Solution
-- ✅ GitHub repo created and configured
-- ✅ `UniCribz.sln` with **7 projects** (API, Data, Shared, Web, 3 test projects)
-- ✅ All project references wired up
-- ✅ `global.json` pinning .NET 8
-- ✅ `.gitignore`, `.gitattributes`, `.editorconfig`, `Directory.Build.props`
-- ✅ `docker-compose.yml` (PostgreSQL + Redis)
-- ✅ `main` and `develop` branches created
+- ✅ GitHub repo with `main` + `develop` branches
+- ✅ `UniCribz.sln` with **7 projects**
+- ✅ All references + NuGet packages
+- ✅ Root configs (`.gitignore`, `.editorconfig`, `Directory.Build.props`, `global.json`, `docker-compose.yml`)
 
-### Dependencies
-- ✅ **26 NuGet packages** installed in `UniCribz.Api` (JWT, EF Core, Redis, Azure, Serilog, Stripe, SendGrid, Twilio, RestSharp, etc.)
-- ✅ **5 packages** in `UniCribz.Data`
-- ✅ **3 packages** in `UniCribz.Web`
-- ✅ **Test frameworks** installed (xUnit, Moq, FluentAssertions, Testcontainers, Playwright)
+### API Layer — 100% Complete
+| Module | Endpoints | Status |
+|--------|-----------|--------|
+| **Auth** | register, login, me, refresh, logout | ✅ |
+| **Property** | search, filter, CRUD, rooms, add room | ✅ |
+| **Application** | submit, list, get, approve, upload doc | ✅ |
+| **Viewing** | book, list, approve, available slots | ✅ |
+| **Lease** | create, sign, terminate, list, mine | ✅ |
+| **Payment** | initiate, upload proof, verify, receipt, list | ✅ |
+| **Maintenance** | submit, list, mine, assign, status | ✅ |
+| **Complaint** | submit, list, mine, resolve | ✅ |
+| **Announcement** | public list, admin list, create, delete | ✅ |
+| **Notification** | list, unread count, mark read | ✅ |
+| **Report** | occupancy, payments, maintenance, dashboard | ✅ |
+| **GoogleMaps** | geocode, nearby (endpoints live; service stubbed for Anothile) | ✅ |
 
-### Folder Structure
-- ✅ **46 folders** created across all projects
-- ✅ **141 placeholder files** created with `// TODO` comments
-- ✅ Every team member's area is scaffolded and ready
+### Design Patterns Implemented
+| Pattern | File Location | Status |
+|---------|---------------|--------|
+| **Strategy** | `Notifications/*` | Scaffolded (Anothile to complete) |
+| **Observer** | `Observers/*` | ✅ **Fully working** — fires on lease termination |
+| **Façade** | `Facades/TenantDashboardFacade.cs` | Scaffolded |
+| **Repository** | `Data/Repositories/*` | ✅ Complete |
 
-### API Configuration
-- ✅ `Program.cs` fully configured: JWT, EF Core, Redis, CORS, Swagger, Serilog, Health Checks
-- ✅ `appsettings.json` with all connection strings and API key placeholders
-- ✅ `launchSettings.json` verified (HTTPS: 7285, HTTP: 5125)
-- ✅ `ServiceCollectionExtensions.cs` placeholder ready to register services
+### Middleware — 100% Complete
+- ✅ `ErrorHandlingMiddleware` — global exception handler returns JSON
+- ✅ `RequestLoggingMiddleware` — Serilog timing per request
+- ✅ `RateLimitingMiddleware` — 60 req/min per IP, returns 429
 
-### Data Layer Scaffolding
-- ✅ `UniCribzDbContext.cs` with `ApplyConfigurationsFromAssembly`
-- ✅ All entity/enum/configuration/repository placeholders created
+### Data Layer Integration
+- ✅ DbContext wired into DI
+- ✅ Seed data runs on startup (idempotent)
+- ✅ 22 DbSets accessible
 
-### Frontend Scaffolding
-- ✅ `_Layout.cshtml` with UniCribz theme applied
-- ✅ `site.css` with color scheme
-- ✅ Web `Program.cs` with HttpClient → API at `https://localhost:7285`
+### Shared Utilities
+- ✅ `PasswordHasher` (BCrypt wrapper)
+- ✅ `JwtTokenGenerator` (primitive-only signature, no Data ref)
+- ✅ `Roles.cs`, `Policies.cs`
 
-### CI/CD & Automation
-- ✅ `.github/workflows/ci.yml` — runs on every push/PR
-- ✅ `.github/workflows/deploy-staging.yml` — guarded on Azure secrets (silently skips if not configured)
-- ✅ `.github/workflows/deploy-production.yml` — blue-green, guarded
-- ✅ `setup/` folder with 5 automation scripts for team onboarding
-
-### Verification
+### Verified Working
 - ✅ `dotnet build` → **0 Warnings, 0 Errors**
-- ✅ `dotnet test` → **3 tests pass** (trivial templates)
-
-**You are the ONLY person who needs to implement anything in the API layer core.** Everything is scaffolded for you.
-
----
-
-## 🎯 Where YOU Need to Start
-
-### Step 0: Start a work session
-
-```bash
-git checkout develop
-git pull
-git checkout feature/backend-api-development
-dotnet build
-```
-
-### Step 1: Shared constants (5 minutes)
-
-**Files:**
-- `src/UniCribz.Shared/Constants/Roles.cs`
-```csharp
-public static class Roles
-{
-    public const string Admin = "Admin";
-    public const string Tenant = "Tenant";
-    public const string Visitor = "Visitor";
-}
-```
-
-- `src/UniCribz.Shared/Constants/Policies.cs`
-```csharp
-public static class Policies
-{
-    public const string AdminOnly = "AdminOnly";
-    public const string TenantOnly = "TenantOnly";
-    public const string TenantOrAdmin = "TenantOrAdmin";
-}
-```
-
-### Step 2: Helpers (30 minutes)
-
-**Files:**
-- `src/UniCribz.Shared/Helpers/PasswordHasher.cs` — wrap `BCrypt.Net.BCrypt`
-  ```csharp
-  public static class PasswordHasher
-  {
-      public static string Hash(string password) => BCrypt.Net.BCrypt.HashPassword(password);
-      public static bool Verify(string password, string hash) => BCrypt.Net.BCrypt.Verify(password, hash);
-  }
-  ```
-
-- `src/UniCribz.Shared/Helpers/JwtTokenGenerator.cs` — generate JWT with claims:
-  ```csharp
-  public static string GenerateToken(User user, IConfiguration config)
-  {
-      var claims = new[]
-      {
-          new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-          new Claim(ClaimTypes.Email, user.Email),
-          new Claim(ClaimTypes.Role, user.Role.ToString())
-      };
-      // ... standard JWT generation
-  }
-  ```
-
-### Step 3: Auth service + controller (2-3 hours)
-
-**Files (in order):**
-1. `src/UniCribz.Api/DTOs/Requests/RegisterRequest.cs`
-2. `src/UniCribz.Api/DTOs/Requests/LoginRequest.cs`
-3. `src/UniCribz.Api/DTOs/Responses/AuthResponse.cs`
-4. `src/UniCribz.Api/Services/Interfaces/IUserService.cs`
-5. `src/UniCribz.Api/Services/UserService.cs`
-6. `src/UniCribz.Api/Controllers/AuthController.cs`
-
-**Endpoints to implement:**
-- `POST /api/auth/register` → hash password, save User, return JWT
-- `POST /api/auth/login` → verify password, return JWT + user info
-- `POST /api/auth/refresh` → issue new JWT from refresh token
-
-### Step 4: Register services in DI
-
-**File:** `src/UniCribz.Api/Extensions/ServiceCollectionExtensions.cs`
-
-Uncomment and add:
-```csharp
-services.AddScoped<IUserService, UserService>();
-services.AddScoped<IPropertyService, PropertyService>();
-// ... as you implement each service
-```
-
-### Step 5: Property + Room endpoints (3-4 hours)
-
-**Files:**
-- `DTOs/Requests/CreatePropertyRequest.cs`
-- `DTOs/Responses/PropertyResponse.cs`
-- `Services/Interfaces/IPropertyService.cs`
-- `Services/PropertyService.cs`
-- `Controllers/PropertyController.cs`
-- `Controllers/RoomController.cs`
-
-**Endpoints:**
-- `GET /api/properties` (public — search + filter)
-- `GET /api/properties/{id}` (public)
-- `POST /api/properties` (Admin only)
-- `PUT /api/properties/{id}` (Admin only)
-- `DELETE /api/properties/{id}` (Admin only)
-- `GET /api/properties/{id}/rooms` (public)
-
-### Step 6: Application + Viewing endpoints
-
-Similar pattern. Reference the API endpoints table in the main README (page 21 of your full README).
-
-### Step 7: Middleware (1 hour)
-
-**Files:**
-- `src/UniCribz.Api/Middleware/ErrorHandlingMiddleware.cs`
-  - Catch all exceptions → return JSON `{ error: message, statusCode }`
-  - Log via Serilog
-- `src/UniCribz.Api/Middleware/RequestLoggingMiddleware.cs`
-
-Register in `Program.cs`:
-```csharp
-app.UseMiddleware<ErrorHandlingMiddleware>();
-app.UseMiddleware<RequestLoggingMiddleware>();
-```
-
-### Step 8: Validators (FluentValidation)
-
-**Files in `src/UniCribz.Api/Validators/`:**
-- `RegisterRequestValidator.cs` — email format, password length, phone format
-- `LoginRequestValidator.cs`
-- `CreateApplicationRequestValidator.cs`
-
-Register in `Program.cs`:
-```csharp
-builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
-```
-
-### Step 9: AutoMapper profile
-
-**File:** `src/UniCribz.Api/Mappings/MappingProfile.cs`
-
-```csharp
-public class MappingProfile : Profile
-{
-    public MappingProfile()
-    {
-        CreateMap<User, AuthResponse>();
-        CreateMap<Property, PropertyResponse>();
-        // ...
-    }
-}
-```
-
-Register:
-```csharp
-builder.Services.AddAutoMapper(typeof(MappingProfile));
-```
-
-### Step 10: Register IRepository + DbContext
-
-Already in `Program.cs`, but confirm the repository is registered:
-```csharp
-services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-```
-(Wait for Siyabonga to complete the repository pattern.)
-
-### Step 11: Run and test
-
-```bash
-cd src/UniCribz.Api
-dotnet run
-```
-
-Open `https://localhost:7285/swagger` → you should see your Auth endpoints.
-
-Test with curl or Postman:
-```bash
-curl -X POST https://localhost:7285/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@test.com","password":"Test@123","fullName":"Test User"}'
-```
-
-### Step 12: Verify CI passes
-
-Push your branch. Go to GitHub Actions. CI should run and pass (or fail on `dotnet format` — ignore that, it's `continue-on-error: true`).
+- ✅ Full `.http` test suite passes (~60 requests)
+- ✅ Observer pattern fires 3 observers on lease terminate
+- ✅ All error paths return correct status codes (400/401/403/404)
+- ✅ DateTime Kind fix in ViewingService
+- ✅ Rate limiting validated
 
 ---
 
-## 🌐 Azure Setup (Do This ONLY When Ready — Week 3-4)
+## ⏳ What's Left
 
-**Don't do this yet.** Wait until:
-- ✅ Auth + Property + Application work locally
-- ✅ Database migrations are complete
-- ✅ Frontend has 2-3 working pages
+### Documentation (Graded Deliverable)
 
-### When Ready — Follow This Order
+**Create these files:**
 
-1. **Install Azure CLI:** https://learn.microsoft.com/cli/azure/install-azure-cli
-2. **Login:** `az login`
-3. **Create resource group:** `az group create --name unicribz-rg --location southafricanorth`
-4. **Create App Services:** staging + production for API and Web (commands in the main README)
-5. **Create PostgreSQL:** `az postgres flexible-server create ...`
-6. **Create Redis:** `az redis create ...`
-7. **Download publish profiles** for each App Service
-8. **Add GitHub Secrets:** Settings → Secrets → Actions → New repository secret
-   - `AZURE_STAGING_API_PUBLISH_PROFILE`
-   - `AZURE_STAGING_WEB_PUBLISH_PROFILE`
-   - `AZURE_PROD_API_PUBLISH_PROFILE`
-   - `AZURE_PROD_WEB_PUBLISH_PROFILE`
-   - `AZURE_CREDENTIALS`
-9. **Create service principal:**
-   ```bash
-   az ad sp create-for-rbac --name "unicribz-github-actions" --role contributor \
-     --scopes /subscriptions/YOUR-SUB-ID/resourceGroups/unicribz-rg --sdk-auth
-   ```
-   Copy output → `AZURE_CREDENTIALS` secret
+| File | Content |
+|------|---------|
+| `docs/team/1-samkelsiwe-frontend.md` | Sam's role doc (already drafted — save it) |
+| `docs/team/2-anothile-integration.md` | Anothile's role doc |
+| `docs/team/3-siyabonga-database.md` | Siyabonga's role doc |
+| `docs/team/4-siyanda-backend-devops.md` | This file |
+| `docs/README-full.md` | Full project README (the big one) |
+| `docs/declaration-of-authenticity.md` | Signed declarations from all 4 members |
+| `docs/data-migration-plan.md` | Assign to Siyabonga (his Step 8) |
+| `docs/deployment/deployment-plan.md` | Azure deployment phases |
+| `docs/deployment/rollback-procedure.md` | Rollback steps |
+| `docs/security/security-architecture.md` | Security layers |
+| `docs/security/risk-register.md` | Risk matrix |
 
-Once secrets are set, the deploy workflows activate automatically.
+**Commit after creating:**
+```bash
+git add docs/
+git commit -m "docs: add team onboarding guides + project documentation"
+git push
+```
+
+### Git Push
+```bash
+git add .
+git commit -m "feat(api): complete backend — all modules, observer pattern, middleware"
+git push origin feature/backend-api-development
+```
+
+Then verify CI on GitHub Actions is green.
+
+### Azure Deployment (Week 3-4)
+Do this **after** Samkelsiwe has 2-3 frontend pages working:
+1. `az login`
+2. `az group create --name unicribz-rg --location southafricanort`
+3. Create App Services (staging + prod) for API + Web
+4. Create PostgreSQL Flexible Server
+5. Create Redis Cache
+6. Create Blob Storage + App Gateway
+7. Download 4 publish profiles
+8. Add 5 GitHub Secrets
+9. Create service principal for blue-green
+10. Push code to trigger staging deploy
 
 ---
 
-## 🔗 What You Depend On
+## 🔗 You Depend On
 
-| From | What | When |
-|------|------|------|
-| **Siyabonga** | `User`, `Property`, `Room`, `Application` entities | Week 1 |
-| **Siyabonga** | `UniCribzDbContext` with DbSets | Week 1 |
-| **Siyabonga** | Repository pattern implementation | Week 2 |
-| **Anothile** | `INotificationManager` for triggering notifications | Week 2 |
-| **Samkelsiwe** | ViewModels/DTOs to define shape of API responses | Week 2 |
+| From | What | Status |
+|------|------|--------|
+| **Siyabonga** | All entities + migrations | ✅ Done |
+| **Anothile** | Notification strategies, Stripe, Google Maps service | ⏳ Pending |
+| **Samkelsiwe** | Frontend UI | ⏳ Pending |
 
 ---
 
-## 🔁 Daily Git Workflow
+## 🔁 Git Workflow
 
 ```bash
-git checkout develop
-git pull
+git checkout develop && git pull
 git checkout feature/backend-api-development
 git merge develop
-
-git add .
-git commit -m "feat(api): implement AuthController with JWT + BCrypt"
+git add . && git commit -m "..."
 git push
 ```
 
@@ -308,13 +140,12 @@ git push
 
 ## 📋 Code Review Reminders
 
-When reviewing teammate PRs:
-- ✅ All endpoints have `[Authorize]` or explicitly `[AllowAnonymous]`
-- ✅ Input validation via FluentValidation
-- ✅ Async/await used consistently
+- ✅ `[Authorize]` / `[AllowAnonymous]` on every endpoint
+- ✅ FluentValidation on all request DTOs
+- ✅ Async/await consistently
 - ✅ No hardcoded secrets
 - ✅ XML doc comments on public methods
-- ✅ Unit tests added for business logic
+- ✅ Unit tests for business logic
 
 ---
 
@@ -327,7 +158,7 @@ docker-compose up -d
 # Run API
 cd src/UniCribz.Api && dotnet run
 
-# Run Web (separate terminal)
+# Run Web
 cd src/UniCribz.Web && dotnet run
 
 # Create migration
@@ -339,14 +170,14 @@ dotnet ef database update --project src/UniCribz.Data --startup-project src/UniC
 # Clean rebuild
 dotnet clean && dotnet restore && dotnet build
 
-# Trust HTTPS dev cert
-dotnet dev-certs https --trust
+# Test suite
+# Open src/UniCribz.Api/UniCribz.Api.http in Visual Studio → run all
 ```
 
 ---
 
 ## 📞 When to Escalate
 
-- Siyabonga's entities aren't ready → use mock DTOs, mock the service layer temporarily
-- CI failing on something you didn't touch → check the log, may be a teammate's PR
-- Azure deployment fails → check the Actions log, usually a publish profile issue
+- Anothile's SendGrid/Twilio strategy not registered → check DI
+- Frontend CORS errors → verify `App:WebBaseUrl` in API appsettings
+- Azure deploy fails → check the Actions log for publish profile issues
