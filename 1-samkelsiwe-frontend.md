@@ -8,7 +8,7 @@
 
 ---
 
-## ✅ What Has Already Been Done
+## What Has Already Been Done
 
 ### By Siyanda (Scaffolding)
 | Item | Location |
@@ -18,20 +18,20 @@
 | NuGet packages installed | Razor Runtime Compilation, Http, Redis Cache |
 | Folder structure created | All folders exist |
 | Placeholder controllers + views + ViewModels | All created |
-| `_Layout.cshtml` replaced with **UniCribz theme** | `Views/Shared/_Layout.cshtml` |
-| `site.css` with **color scheme** | `wwwroot/css/site.css` |
+| `_Layout.cshtml` replaced with UniCribz theme | `Views/Shared/_Layout.cshtml` |
+| `site.css` with color scheme | `wwwroot/css/site.css` |
 | `Program.cs` configured (MVC, HttpClient, Session) | `src/UniCribz.Web/Program.cs` |
 | `appsettings.json` → `Api:BaseUrl` = `http://localhost:5125` | Configured |
 
-### By Siyanda (Backend API — Fully Live)
-**The entire API is now complete and tested.** Everything you need is available.
+### By Siyanda (Backend API — Production-Ready)
+The entire API is complete, tested, and production-hardened.
 
 | Module | Endpoints Available |
 |--------|---------------------|
 | Auth | register, login, me, refresh, logout |
 | Property | search, filter, get, create, update, delete, rooms, add room |
 | Application | submit, list, get, approve, upload document |
-| Viewing | book, list, approve, **available slots** |
+| Viewing | book, list, approve, available slots |
 | Lease | create, sign, terminate, list, mine |
 | Payment | initiate, upload proof, verify, receipt, list |
 | Maintenance | submit, list, mine, assign, status |
@@ -40,9 +40,11 @@
 | Notification | list, unread count, mark read |
 | Report | occupancy, payments, maintenance, dashboard |
 
+**Every response includes an `X-Correlation-Id` header** — capture it if you need to report an issue.
+
 ---
 
-## 🎨 Design System (Already Applied)
+## Design System (Already Applied)
 
 | Role | Color | Hex |
 |------|-------|-----|
@@ -57,7 +59,7 @@
 
 ---
 
-## 🌐 Actual Dev URLs
+## Actual Dev URLs
 
 | Service | URL |
 |---------|-----|
@@ -66,11 +68,13 @@
 | **API (HTTP)** | `http://localhost:5125` ← **use this** |
 | API (HTTPS) | `https://localhost:7285` |
 | Swagger UI | `http://localhost:5125/swagger` |
-| Health | `http://localhost:5125/health` |
+| **Health (liveness)** | `http://localhost:5125/health/live` |
+| **Health (readiness)** | `http://localhost:5125/health/ready` |
+| Health (full) | `http://localhost:5125/health` |
 
 ---
 
-## 🎯 Where YOU Need to Start
+## Where YOU Need to Start
 
 ### Step 0: Get the project running
 
@@ -185,7 +189,7 @@ dotnet run
 
 ---
 
-## 🔗 What You Depend On (Updated)
+## What You Depend On (Updated)
 
 | From | What | Status |
 |------|------|--------|
@@ -199,7 +203,16 @@ dotnet run
 
 ---
 
-## 🔁 Daily Git Workflow
+## Important Notes
+
+- **Rate limiting:** The API limits each IP to **100 requests per minute**. If you hammer it during development, you'll get `429 Too Many Requests` with `Retry-After: 60`. Wait a minute and continue.
+- **Correlation IDs:** Every response has an `X-Correlation-Id` header. If you need to report a bug, send that ID — Siyanda can search the log for that exact request.
+- **HTTPS:** The API enforces HTTPS in production, but in Development it runs on HTTP `http://localhost:5125`. Point your `Api:BaseUrl` there.
+- **Error format:** All errors come back as `{ "error": "...", "statusCode": 400, "correlationId": "...", "timestamp": "..." }`. Handle that shape in your JS.
+
+---
+
+## Daily Git Workflow
 
 ```bash
 git checkout develop && git pull
@@ -215,16 +228,17 @@ git push
 
 ---
 
-## ❓ If Something Breaks
+## If Something Breaks
 
 1. `dotnet clean && dotnet build` in `src/UniCribz.Web/`
 2. `dotnet dev-certs https --trust` for HTTPS warnings
-3. Is the API running? Check `http://localhost:5125/swagger`
-4. If API returns 401, your token expired — re-login
+3. Is the API running? Check `http://localhost:5125/health/live`
+4. If API returns `401`, your token expired — re-login
+5. If API returns `429`, you hit the rate limit — wait 60s
 
 ---
 
-## 📚 Reference
+## Reference
 
 - **Swagger (test endpoints live):** http://localhost:5125/swagger
 - **Prototype:** https://github.com/SiyandaNduze/UniCribz-Web-app.git

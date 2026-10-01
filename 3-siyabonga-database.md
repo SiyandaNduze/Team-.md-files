@@ -8,7 +8,7 @@
 
 ---
 
-## ✅ What Has Already Been Done (Your Work Is 100% Complete)
+## Your Work Is 100% Complete
 
 ### Delivered by you
 | Item | Status |
@@ -20,15 +20,26 @@
 | `UniCribzDbContext` with 22 DbSets + ApplyConfigurationsFromAssembly | ✅ |
 | 2 migrations applied (`InitialCreate`, `SecondMigration`) | ✅ |
 | 20 tables in PostgreSQL | ✅ |
-| Repository pattern (IRepository<T> + specialized) | ✅ |
+| Repository pattern (`IRepository<T>` + specialized) | ✅ |
 | Data seeder — 3 users, 3 universities, 5 amenities, 1 property, 3 rooms | ✅ |
 | BCrypt-hashed demo passwords | ✅ |
 
 **Verified in production:** Every API endpoint returns data from the tables you designed. Migrations applied cleanly. Foreign keys enforced. Seed data present.
 
+### Production-Hardening Applied to Your Layer
+| Item | Status |
+|------|--------|
+| EF Core retry on transient failures (3 retries, 5s delay) | ✅ |
+| Query splitting behavior (SplitQuery for multi-collection includes) | ✅ |
+| Command timeout (30s) | ✅ |
+| Auto-migration on startup (config-controlled via `Database:MigrateOnStartup`) | ✅ |
+| Seed-on-startup configurable via `Database:SeedOnStartup` | ✅ |
+
+These were added by Siyanda in the production-hardening pass — your entities are unchanged.
+
 ---
 
-## ⏳ Still To Do (One Item)
+## Still To Do (One Item)
 
 ### `docs/data-migration-plan.md`
 
@@ -86,22 +97,28 @@
 
 **Estimated time:** 30 minutes.
 
-When done: `git add docs/data-migration-plan.md && git commit -m "docs: add data migration plan" && git push`
+When done:
+```bash
+git add docs/data-migration-plan.md
+git commit -m "docs: add data migration plan"
+git push
+```
 
 ---
 
-## 🎉 Your Technical Deliverables Are Complete
+## Your Technical Deliverables Are Complete
 
 You're done with everything except the one doc above. If you want to keep contributing after, potential extensions:
 
 - Additional repository patterns for other entities
 - Soft-delete filters via EF Core global query filters
 - Audit fields (CreatedBy, UpdatedBy) with EF Core interceptors
-- Additional seed data (test leases, payments, complaints)
+- Additional seed data (test leases, payments, complaints, announcements)
 
 ---
 
-## 📚 Reference
+## Reference
 
 - **Project doc:** Domain Class Diagram (p.21), ERD (p.44)
 - **DB status:** All 20 tables created and verified
+- **Migrations:** `20260930143546_InitialCreate`, `20261001083400_SecondMigration`

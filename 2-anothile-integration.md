@@ -8,7 +8,7 @@
 
 ---
 
-## ✅ What Has Already Been Done
+## What Has Already Been Done
 
 ### By Siyanda (Scaffolding)
 | Item | Location |
@@ -21,7 +21,7 @@
 | `appsettings.json` with all API key sections | SendGrid, Twilio, Stripe, GoogleMaps |
 | DI registration slot in `ServiceCollectionExtensions.cs` | Ready for your code |
 
-### By Siyanda (Backend Infrastructure — Live)
+### By Siyanda (Backend — Production-Ready)
 | Item | Status |
 |------|--------|
 | `Payment` entity with all fields (StripePaymentIntentId, ProofOfPaymentUrl, etc.) | ✅ |
@@ -31,12 +31,17 @@
 | `PaymentService` — local flow works; you plug in Stripe | ✅ |
 | `NotificationService` — basic query; you plug in Strategy + sends | ✅ |
 | GoogleMaps endpoints `GET /api/maps/geocode` and `/nearby` | ✅ (registered, service pending) |
+| Health checks split (live/ready) | ✅ |
+| Rate limiting (100 req/min/IP via framework) | ✅ |
+| Correlation IDs on all responses | ✅ |
+| Security headers + HSTS | ✅ |
+| Validated Options pattern for SendGrid/Twilio/Stripe keys | ✅ |
 
 **Important:** The `GoogleMapsApi` (v6) package doesn't exist. Use **`RestSharp` v112** (already installed).
 
 ---
 
-## 🎯 Where YOU Need to Start
+## Where YOU Need to Start
 
 ### Step 0: Get the project running
 
@@ -160,20 +165,30 @@ Wrap `INotificationManager` with business logic:
 
 ---
 
-## 🔗 What You Depend On
+## What You Depend On
 
 | From | What | Status |
 |------|------|--------|
 | **Siyabonga** | Payment + Notification entities | ✅ Done |
 | **Siyanda** | `Program.cs` with Stripe/SendGrid/Twilio config | ✅ Done |
 | **Siyanda** | Payment controller + service skeleton | ✅ Done |
+| **Siyanda** | DI registration slot ready | ✅ Done |
 | **Samkelsiwe** | UI triggers (Pay Now, notification bell) | ⏳ Pending |
 
 **You're unblocked — start with Step 1.**
 
 ---
 
-## 🔑 API Keys — Where They Go
+## Important Notes
+
+- **Error format:** If a notification send fails, the whole `NotifyAsync` call will throw. Wrap each strategy call in a try/catch so one failure (e.g., SendGrid down) doesn't block SMS + InApp.
+- **Correlation IDs:** Every API response has an `X-Correlation-Id`. Log it with every send so support can trace notification failures back to a specific request.
+- **Rate limiting:** The framework limits each IP to 100 req/min. If you test SendGrid in a loop, you'll get 429s. Space your tests out.
+- **Health checks:** `GET /health/ready` verifies Redis + Postgres. If your notification service depends on Redis, this is your smoke test.
+
+---
+
+## API Keys — Where They Go
 
 | Key | Location | Source |
 |-----|----------|--------|
@@ -192,9 +207,11 @@ dotnet user-secrets set "Stripe:SecretKey" "sk_test_xxxxx"
 dotnet user-secrets set "GoogleMaps:ApiKey" "AIzaxxxxx"
 ```
 
+In Azure production, keys are set as **App Service environment variables** (never in files).
+
 ---
 
-## 🔁 Daily Git Workflow
+## Daily Git Workflow
 
 ```bash
 git checkout develop && git pull
@@ -206,8 +223,9 @@ git push
 
 ---
 
-## ❓ If Something Breaks
+## If Something Breaks
 
 - RestSharp not restoring? `dotnet nuget locals all --clear && dotnet restore`
 - SendGrid/Twilio key invalid? Test at their dashboard
 - Stripe webhook fails? `Stripe:WebhookSecret` must match dashboard
+- Getting `429 Too Many Requests`? Rate limiter — wait 60s
